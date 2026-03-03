@@ -2,10 +2,19 @@
 import sys
 from pathlib import Path
 
+# 1. 注册主项目根目录 (你原有的代码)
 root_dir = Path(__file__).resolve().parent
 if str(root_dir) not in sys.path:
     sys.path.append(str(root_dir))
 
+# 2. 新增：注册 pentest-agent 子项目的绝对路径
+# 这样底层代码执行 import agents 或 import utils 时就能直接找到了
+pentest_agent_dir = root_dir / "src" / "Agent" / "subagent" / "pentest_agent" / "pentest-agent"
+if str(pentest_agent_dir) not in sys.path:
+    # 使用 insert(0) 把它放在路径列表最前面，防止主项目中刚好也有同名文件夹产生冲突
+    sys.path.insert(0, str(pentest_agent_dir))
+
+# 3. 必须在完成路径注册后，再进行本地模块的导入！
 from src.Agent.manager.graph import app
 
 
