@@ -2,19 +2,14 @@
 from typing import List
 from langchain_core.tools import BaseTool
 # 导入你写好的工具
-'''
-from src.tools.scanners.fscan_tool import FscanTool
+
+from typing import List
+from langchain_core.tools import BaseTool
+from src.tools.pentest_agent.pentest_tool import PentestAgentTool
 
 def get_all_tools() -> List[BaseTool]:
-    """
-    集中返回所有已注册的工具。
-    大模型（Manager Agent）将通过此函数获取其可以使用的所有能力。
-    """
+    """集中返回所有已注册的工具。"""
     return [
-        FscanTool(),
-        # 后续只需在这里继续添加：
-        # SqlmapTool(),
-        # DirsearchTool(),
-        # PentestAGITool(),
+        PentestAgentTool(),
+        # 后续其他工具...
     ]
-'''
