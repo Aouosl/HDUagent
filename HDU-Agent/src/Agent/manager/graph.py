@@ -1,32 +1,33 @@
 # src/Agent/manager/graph.py
 from langgraph.graph import StateGraph, END
 from .state import AgentState
-from .nodes import manager_node, pentest_agent_node
+from .nodes import manager_node, pentest_agent_node, analyzer_node # 新增导入 analyzer_node
 from langchain_core.messages import AIMessage
 
 workflow = StateGraph(AgentState)
 
+# 1. 注册所有的 Node
+workflow.add_node("analyzer", analyzer_node)
 workflow.add_node("manager", manager_node)
 workflow.add_node("pentest_agent", pentest_agent_node)
 
-workflow.set_entry_point("manager")
+# 2. 将图的起点设置为 analyzer
+workflow.set_entry_point("analyzer")
 
+# 3. 添加从 analyzer 流向 manager 的必经边
+workflow.add_edge("analyzer", "manager")
 
-# 核心路由逻辑：判断最后一条消息是否包含工具调用
+# 核心路由逻辑保持不变
 def route_after_manager(state: AgentState) -> str:
     messages = state.get("messages", [])
     if not messages:
         return "FINISH"
 
     last_message = messages[-1]
-
-    # 如果大模型决定调用工具，它会返回带有 tool_calls 属性的 AIMessage
     if isinstance(last_message, AIMessage) and last_message.tool_calls:
         return "pentest_agent"
 
-    # 如果没有 tool_calls，说明大模型直接用自然语言回复了用户，流程结束
     return "FINISH"
-
 
 workflow.add_conditional_edges(
     "manager",
@@ -37,7 +38,7 @@ workflow.add_conditional_edges(
     }
 )
 
-# 子智能体返回 ToolMessage 后，无条件流转回 manager，让 manager 看结果并做总结
+# 工具执行完毕后，回流 manager 检查结果并进行下一步
 workflow.add_edge("pentest_agent", "manager")
 
 app = workflow.compile()

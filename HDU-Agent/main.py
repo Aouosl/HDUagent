@@ -19,16 +19,16 @@ from src.Agent.manager.graph import app
 
 
 def main():
-    print("🚀 Manager Agent 交互终端已启动！(输入 'quit' 退出)\n" + "-" * 40)
+    print("Manager Agent 交互终端已启动！(输入 'quit' 退出)\n" + "-" * 40)
 
     # 维护一个全局对话历史，充当短期记忆
     chat_history = []
 
     while True:
         # 1. 获取用户持续输入
-        user_input = input("\n🧑‍💻 用户: ")
+        user_input = input("\nUser:")
         if user_input.lower() in ['quit', 'exit', 'q']:
-            print("👋 测试结束，再见！")
+            print("测试结束，再见！")
             break
 
         if not user_input.strip():
@@ -42,7 +42,7 @@ def main():
             "messages": chat_history
         }
 
-        print("⏳ Agent 思考中...\n")
+        print("Agent 思考中...\n")
 
         try:
             # 2. 运行图
@@ -68,7 +68,7 @@ def main():
                         chat_history.append(("user", content))
 
         except Exception as e:
-            print(f"\n❌ 运行出错：{e}")
+            print(f"\n运行出错：{e}")
 
 
 if __name__ == "__main__":
