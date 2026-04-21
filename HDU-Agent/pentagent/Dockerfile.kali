@@ -1,0 +1,101 @@
+# PentestAgent Kali Linux Image
+# Full penetration testing environment
+
+FROM kalilinux/kali-rolling
+
+LABEL maintainer="Masic"
+LABEL description="PentestAgent with Kali Linux tools"
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+RUN echo "deb http://mirrors.tuna.tsinghua.edu.cn/kali kali-rolling main contrib non-free non-free-firmware" > /etc/apt/sources.list && \
+    echo "deb http://mirrors.aliyun.com/kali kali-rolling main contrib non-free non-free-firmware" >> /etc/apt/sources.list
+
+RUN echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80retries && \
+    echo 'Acquire::http::Timeout "120";' >> /etc/apt/apt.conf.d/80retries && \
+    echo 'Acquire::https::Timeout "120";' >> /etc/apt/apt.conf.d/80retries
+
+
+
+# Update and install Kali tools
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Python (python3-full includes venv with ensurepip)
+    python3-full \
+    python3-pip \
+    # Kali meta-packages (selective for size)
+    kali-tools-web \
+    kali-tools-information-gathering \
+    kali-tools-vulnerability \
+    kali-tools-exploitation \
+    # Additional tools
+    nmap \
+    nikto \
+    dirb \
+    gobuster \
+    sqlmap \
+    wpscan \
+    hydra \
+    john \
+    hashcat \
+    metasploit-framework \
+    burpsuite \
+    zaproxy \
+    nuclei \
+    ffuf \
+    # Network tools
+    openvpn \
+    wireguard \
+    proxychains4 \
+    tor \
+    # Utilities
+    curl \
+    wget \
+    git \
+    vim \
+    tmux \
+    jq \
+    xclip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /app
+
+# Install Python dependencies using virtual environment (PEP 668 compliance)
+COPY requirements.txt .
+
+RUN python3 -m venv /opt/venv && \
+    mkdir -p /root/.config/pip && \
+    printf '[global]\nindex-url = https://pypi.tuna.tsinghua.edu.cn/simple\nextra-index-url = https://pypi.mirrors.ustc.edu.cn/simple/\nretries = 10\ntimeout = 120\n' > /root/.config/pip/pip.conf && \
+    /opt/venv/bin/pip install --no-cache-dir --upgrade pip wheel setuptools
+
+# Install heavy dependencies first (helps with CI memory limits)
+COPY . .
+
+COPY pyproject.toml .
+RUN /opt/venv/bin/pip install --no-cache-dir -e ".[all]"
+# Add venv to PATH
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy application code
+COPY . .
+
+# Copy common wordlists
+RUN mkdir -p /wordlists && \
+    cp -r /usr/share/wordlists/* /wordlists/ 2>/dev/null || true
+
+# Set permissions
+RUN chmod +x /app/scripts/*.sh 2>/dev/null || true
+
+# Entry point
+COPY docker-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 \
+  CMD python3 -c "import os; exit(0)"
+
+ENTRYPOINT ["/bin/bash", "-c", "/entrypoint.sh && while true; do sleep 3600; done"]
+CMD ["python3", "-m", "pentestagent"]

@@ -1,0 +1,389 @@
+nohup: ignoring input
+/root/.virtualenvs/HDUagent/lib/python3.12/site-packages/requests/__init__.py:113: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (7.0.1)/charset_normalizer (3.4.5) doesn't match a supported version!
+  warnings.warn(
+INFO:     Started server process [3070]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     39.170.111.12:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     39.170.111.12:0 - "GET / HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/dashboard/public/stats HTTP/1.0" 404 Not Found
+INFO:     39.170.111.12:0 - "GET /favicon.ico HTTP/1.0" 404 Not Found
+INFO:     39.170.111.12:0 - "GET /register.html HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /register.html HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /favicon.ico HTTP/1.0" 404 Not Found
+INFO:     39.170.111.12:0 - "GET /login.html HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "POST /api/auth/login HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /index.html HTTP/1.0" 304 Not Modified
+INFO:     39.170.111.12:0 - "GET /js/main.js HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /js/components/Dashboard.js HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /js/components/VulnList.js HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /index.html HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /js/main.js HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /js/components/Dashboard.js HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /js/components/ChatTerminal.js HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /js/components/VulnList.js HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBb3Vvc2wiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzcyOTA5NDh9.zU3Y0VnuPbyGyHQ1TjCXrJwG8plnO_Ldb9gk7k3sNIg" [accepted]
+INFO:     connection open
+INFO:     39.170.111.12:0 - "GET /api/chat/history?session_id=chat_1776501787396_8hytku HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/dashboard/vulnerabilities HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/dashboard/stats HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/chat/sessions HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /favicon.ico HTTP/1.0" 404 Not Found
+INFO:     39.170.111.12:0 - "GET /api/chat/history?session_id=chat_1776680059346_893ltz HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/chat/history?session_id=chat_1776678299440_igg2yc HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/chat/history?session_id=chat_1776680059346_893ltz HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/chat/history?session_id=chat_1776584490789_6ohf2y HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/chat/history?session_id=chat_1776678299440_igg2yc HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/chat/history?session_id=chat_1776584490789_6ohf2y HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/chat/history?session_id=chat_1776678299440_igg2yc HTTP/1.0" 200 OK
+INFO:     connection closed
+[-] 操作员 Aouosl 连接已断开
+INFO:     43.157.20.63:0 - "GET / HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET / HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/dashboard/public/stats HTTP/1.0" 404 Not Found
+INFO:     39.170.111.8:0 - "GET /login.html HTTP/1.0" 304 Not Modified
+INFO:     39.170.111.8:0 - "POST /api/auth/login HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /js/main.js HTTP/1.0" 304 Not Modified
+INFO:     39.170.111.8:0 - "GET /js/components/Dashboard.js HTTP/1.0" 304 Not Modified
+INFO:     39.170.111.8:0 - "GET /js/components/VulnList.js HTTP/1.0" 304 Not Modified
+INFO:     39.170.111.8:0 - "GET /js/components/ChatTerminal.js HTTP/1.0" 304 Not Modified
+INFO:     39.170.111.8:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBb3Vvc2wiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzcyOTE0OTJ9.BalqO6GnGx57v1hLSRaJBdAaPkRvcVV5FgihLE6iwQQ" [accepted]
+INFO:     connection open
+INFO:     39.170.111.8:0 - "GET /api/chat/history?session_id=chat_1776680059346_893ltz HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/dashboard/stats HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/dashboard/vulnerabilities HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/chat/sessions HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/chat/history?session_id=chat_1776678299440_igg2yc HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/chat/history?session_id=chat_1776680059346_893ltz HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /index.html HTTP/1.0" 304 Not Modified
+INFO:     connection closed
+[-] 操作员 Aouosl 连接已断开
+INFO:     39.170.111.8:0 - "GET /api/dashboard/vulnerabilities HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/chat/history?session_id=chat_1776680059346_893ltz HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/dashboard/stats HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/chat/sessions HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBb3Vvc2wiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzcyOTE0OTJ9.BalqO6GnGx57v1hLSRaJBdAaPkRvcVV5FgihLE6iwQQ" [accepted]
+INFO:     connection open
+INFO:     39.170.111.12:0 - "GET /index.html HTTP/1.0" 304 Not Modified
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     39.170.111.12:0 - "GET /api/dashboard/stats HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     39.170.111.12:0 - "GET /api/chat/history?session_id=chat_1776681249903_rwaejh HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/chat/sessions HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "GET /api/dashboard/vulnerabilities HTTP/1.0" 200 OK
+INFO:     connection closed
+INFO:     39.170.111.12:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 Aouosl 连接已断开
+INFO:     39.170.111.8:0 - "POST /api/auth/login HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/dashboard/stats HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBb3Vvc2wiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzcyOTE3MTF9.9alM_VMGHtMe-AyP4-d4RQqNzKmdnKkqEYAZFSDjiR8" [accepted]
+INFO:     connection open
+INFO:     39.170.111.8:0 - "GET /api/chat/history?session_id=chat_1776680059346_893ltz HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/dashboard/vulnerabilities HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/chat/sessions HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "GET /api/chat/history?session_id=chat_1776678299440_igg2yc HTTP/1.0" 200 OK
+INFO:     39.170.111.12:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     101.34.59.115:0 - "GET / HTTP/1.0" 200 OK
+INFO:     50.116.26.161:0 - "GET / HTTP/1.0" 200 OK
+INFO:     connection closed
+INFO:     39.170.111.12:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+[-] 操作员 ironessi 连接已断开
+INFO:     172.235.40.131:0 - "GET / HTTP/1.0" 200 OK
+INFO:     45.92.1.236:0 - "GET /.env HTTP/1.0" 404 Not Found
+INFO:     connection closed
+[-] 操作员 Aouosl 连接已断开
+INFO:     45.79.8.221:0 - "GET / HTTP/1.0" 200 OK
+INFO:     39.170.111.8:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBb3Vvc2wiLCJ1c2VyX2lkIjoxLCJleHAiOjE3NzcyOTE3MTF9.9alM_VMGHtMe-AyP4-d4RQqNzKmdnKkqEYAZFSDjiR8" [accepted]
+INFO:     connection open
+INFO:     39.103.159.236:0 - "GET / HTTP/1.0" 200 OK
+INFO:     39.98.56.161:0 - "GET / HTTP/1.0" 200 OK
+INFO:     connection closed
+INFO:     39.170.111.12:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 Aouosl 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     43.167.157.80:0 - "GET / HTTP/1.0" 200 OK
+INFO:     65.110.6.242:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     77.83.39.94:0 - "GET /.git/index HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     134.209.235.25:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+[-] 操作员 ironessi 连接已断开
+INFO:     34.179.164.237:0 - "OPTIONS / HTTP/1.0" 405 Method Not Allowed
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     157.55.39.56:0 - "GET / HTTP/1.0" 200 OK
+INFO:     40.77.167.154:0 - "GET /api/dashboard/public/stats HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     212.73.148.27:0 - "GET / HTTP/1.0" 200 OK
+INFO:     212.73.148.27:0 - "GET /favicon.ico HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     206.189.183.13:0 - "GET /.git/config HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     137.184.85.24:0 - "GET / HTTP/1.0" 200 OK
+INFO:     5.61.209.107:0 - "GET /SDK/webLanguage HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     206.189.183.13:0 - "GET /.git/config HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     43.153.36.110:0 - "GET / HTTP/1.0" 200 OK
+INFO:     77.83.39.197:0 - "GET /.env HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+[-] 操作员 ironessi 连接已断开
+INFO:     14.241.166.9:0 - "GET / HTTP/1.0" 200 OK
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     172.236.119.165:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     205.210.31.16:0 - "GET / HTTP/1.0" 200 OK
+INFO:     45.148.10.67:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     172.236.228.224:0 - "GET / HTTP/1.0" 200 OK
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     66.132.195.62:0 - "GET / HTTP/1.0" 200 OK
+INFO:     66.132.195.62:0 - "GET /favicon.ico HTTP/1.0" 404 Not Found
+INFO:     66.132.195.62:0 - "GET /robots.txt HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+[-] 操作员 ironessi 连接已断开
+INFO:     66.228.53.204:0 - "GET / HTTP/1.0" 200 OK
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     66.228.53.78:0 - "GET / HTTP/1.0" 200 OK
+INFO:     3.132.26.232:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     176.65.139.254:0 - "GET / HTTP/1.0" 200 OK
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     103.203.56.3:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     54.161.202.8:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     43.166.244.251:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     172.236.228.208:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     45.79.207.111:0 - "GET / HTTP/1.0" 200 OK
+INFO:     176.65.148.37:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     77.83.39.94:0 - "GET /.git/HEAD HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     157.55.39.205:0 - "GET / HTTP/1.0" 200 OK
+INFO:     50.116.26.161:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     66.228.53.136:0 - "GET / HTTP/1.0" 200 OK
+INFO:     172.236.127.133:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     45.33.14.5:0 - "GET / HTTP/1.0" 200 OK
+INFO:     157.55.39.56:0 - "GET / HTTP/1.0" 200 OK
+INFO:     157.55.39.56:0 - "GET /login.html HTTP/1.0" 200 OK
+INFO:     43.133.253.253:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     45.79.207.181:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     147.185.132.20:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     64.62.156.10:0 - "GET / HTTP/1.0" 200 OK
+INFO:     64.62.156.10:0 - "GET /webui/ HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     64.62.156.15:0 - "GET /favicon.ico HTTP/1.0" 404 Not Found
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     64.62.156.10:0 - "GET /geoserver/web/ HTTP/1.0" 404 Not Found
+INFO:     69.164.217.74:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     198.46.135.190:0 - "GET / HTTP/1.0" 200 OK
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+INFO:     20.65.195.60:0 - "GET /developmentserver/metadatauploader HTTP/1.0" 404 Not Found
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+INFO:     183.157.177.73:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open
+INFO:     connection closed
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+[-] 操作员 ironessi 连接已断开
+INFO:     124.156.179.141:0 - "GET / HTTP/1.0" 200 OK
+INFO:     162.240.179.212:0 - "GET / HTTP/1.0" 200 OK
+INFO:     39.170.111.4:0 - "WebSocket /ws/chat?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpcm9uZXNzaSIsInVzZXJfaWQiOjIsImV4cCI6MTc3NzI3NzM3NX0.tjc77DLzf4RLUupdyjbONV9MxwWktImoYc1X_T0Nwbc" [accepted]
+INFO:     connection open

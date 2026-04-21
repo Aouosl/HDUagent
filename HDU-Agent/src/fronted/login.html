@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 | 凌霄 · 云端渗透作战平台</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.staticfile.net/vue/3.3.4/vue.global.min.js"></script>
+    <script src="https://cdn.staticfile.net/axios/1.6.2/axios.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body {
+            background: #0b0f19;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        /* 粒子画布容器 */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        [v-cloak] { display: none !important; }
+
+        /* 按钮扫光动画 */
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.2) 30%, transparent 60%);
+            transform: rotate(25deg);
+            animation: shine 6s infinite linear;
+        }
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(25deg); }
+            20% { transform: translateX(100%) rotate(25deg); }
+            100% { transform: translateX(200%) rotate(25deg); }
+        }
+
+        /* 卡片悬浮效果 */
+        .glass-card {
+            background: rgba(17, 25, 40, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 输入框样式 */
+        .input-dark {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            color: #e2e8f0;
+            transition: all 0.2s;
+        }
+        .input-dark:focus {
+            outline: none;
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .input-dark::placeholder {
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 粒子背景画布 -->
+    <canvas id="particle-canvas"></canvas>
+
+    <div id="app" v-cloak class="relative z-10 w-full max-w-md">
+        <div class="glass-card rounded-3xl p-8 md:p-10">
+
+            <!-- Logo & 标题 -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/30">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-white tracking-tight">授权登录</h1>
+                <p class="text-sm text-gray-400 mt-2">凌霄 · 云端渗透作战平台</p>
+            </div>
+
+            <!-- 错误提示 -->
+            <div v-if="errorMsg" class="mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-sm text-center backdrop-blur-sm">
+                {{ errorMsg }}
+            </div>
+
+            <!-- 登录表单 -->
+            <form @submit.prevent="handleLogin" class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">操作员账号</label>
+                    <input v-model="form.username" type="text" required placeholder="请输入用户名"
+                           class="w-full input-dark px-4 py-3 rounded-xl text-base">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">访问密码</label>
+                    <input v-model="form.password" type="password" required placeholder="••••••••"
+                           class="w-full input-dark px-4 py-3 rounded-xl text-base">
+                </div>
+
+                <button type="submit" :disabled="isLoading"
+                        class="btn-shine relative w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                    <span v-if="isLoading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    <span v-else>进入控制台</span>
+                </button>
+            </form>
+
+            <!-- 注册链接 -->
+            <div class="mt-8 text-center text-sm text-gray-400">
+                尚未分配系统访问权限？
+                <a href="register.html" class="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">申请注册账号</a>
+            </div>
+        </div>
+
+        <!-- 页脚版权 -->
+        <p class="text-center text-gray-500 text-xs mt-6">© 2026 凌霄 · 安全研究用途，请合法使用</p>
+    </div>
+
+    <!-- 粒子动画脚本 (与 landing 一致) -->
+    <script>
+        (function() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+
+            function initParticles() {
+                const count = Math.floor((width * height) / 12000);
+                particles = [];
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        radius: Math.random() * 2 + 1,
+                        speedX: (Math.random() - 0.5) * 0.3,
+                        speedY: (Math.random() - 0.5) * 0.3,
+                        color: `rgba(${99 + Math.floor(Math.random()*156)}, ${102 + Math.floor(Math.random()*100)}, ${241 + Math.floor(Math.random()*14)}, ${0.2 + Math.random()*0.3})`
+                    });
+                }
+            }
+
+            function resizeCanvas() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                initParticles();
+            }
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+
+                    if (p.x < 0 || p.x > width) p.speedX *= -1;
+                    if (p.y < 0 || p.y > height) p.speedY *= -1;
+                });
+
+                ctx.strokeStyle = 'rgba(139, 92, 246, 0.08)';
+                ctx.lineWidth = 0.5;
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                requestAnimationFrame(drawParticles);
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            drawParticles();
+        })();
+    </script>
+
+    <!-- Vue 登录逻辑 (与原版完全一致) -->
+    <script>
+        const { createApp, ref } = Vue;
+
+        createApp({
+            setup() {
+                const form = ref({ username: '', password: '' });
+                const isLoading = ref(false);
+                const errorMsg = ref('');
+
+                const handleLogin = async () => {
+                    isLoading.value = true;
+                    errorMsg.value = '';
+                    try {
+                        const response = await axios.post('/api/auth/login', form.value);
+                        if (response.data && response.data.access_token) {
+                            localStorage.setItem('hdu_token', response.data.access_token);
+                            localStorage.setItem('hdu_username', form.value.username);
+                            window.location.href = 'index.html';
+                        } else {
+                            errorMsg.value = "服务器未返回有效的 Token，请联系管理员。";
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        if (error.response && error.response.data) {
+                            errorMsg.value = error.response.data.detail || "用户名或密码错误";
+                        } else {
+                            errorMsg.value = "网络通信异常，请检查后端服务是否启动。";
+                        }
+                    } finally {
+                        isLoading.value = false;
+                    }
+                };
+
+                return { form, isLoading, errorMsg, handleLogin };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
