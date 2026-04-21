@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/HDU-Agent/src/Agent/subagent/pentest_agent/pentest-agent" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/HDU-Agent/pentestagent" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/HDU-Agent/pentestagent/pentestagent/loot/workspace/marshalsec" vcs="Git" />
   </component>
 </project>
