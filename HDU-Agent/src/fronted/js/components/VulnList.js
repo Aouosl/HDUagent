@@ -1,8 +1,9 @@
 const { ref, onMounted, watch } = window.Vue;
 
 export default {
-    name: 'VulnList',
-    props: ['token'],
+    name: "VulnList",
+    props: ["token"],
+    emits: ["show-toast"],
     template: `
         <main class="flex-1 overflow-y-auto p-4 md:p-6 transition-colors duration-300 bg-transparent">
             <div class="rounded-2xl shadow-sm border flex flex-col h-full transition-all backdrop-blur-md bg-slate-800/40 border-slate-700/50">
@@ -11,9 +12,18 @@ export default {
                         <h2 class="text-lg font-bold text-slate-100">全局漏洞情报中心</h2>
                         <p class="text-xs mt-1 text-slate-400">展示所有用户、所有节点发现的安全漏洞数据</p>
                     </div>
-                    <button @click="fetchVulns" class="p-2 rounded-lg transition-colors hover:bg-indigo-500/10 text-slate-300 hover:text-indigo-300">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    </button>
+                    <div class="flex gap-3 items-center">
+                        <select v-model="filterSeverity" @change="fetchVulns(1)" class="py-1.5 px-3 text-xs rounded-lg bg-slate-700/50 border border-slate-600 text-slate-200 focus:outline-none focus:border-indigo-500/50">
+                            <option value="">全部等级</option>
+                            <option value="critical">致命</option>
+                            <option value="high">高危</option>
+                            <option value="medium">中危</option>
+                            <option value="low">低危</option>
+                        </select>
+                        <button @click="fetchVulns(currentPage)" class="p-2 rounded-lg transition-colors hover:bg-indigo-500/10 text-slate-300 hover:text-indigo-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="flex-1 overflow-auto p-0">
@@ -21,7 +31,7 @@ export default {
                         <thead class="text-xs uppercase sticky top-0 z-10 border-b backdrop-blur-md bg-slate-800/80 text-slate-300 border-slate-700/50">
                             <tr>
                                 <th class="px-6 py-4 font-medium">发现时间</th>
-                                <th class="px-6 py-4 font-medium">白帽子 (用户)</th>
+                                <th class="px-6 py-4 font-medium">白帽子(用户)</th>
                                 <th class="px-6 py-4 font-medium">攻击目标</th>
                                 <th class="px-6 py-4 font-medium">漏洞名称</th>
                                 <th class="px-6 py-4 font-medium">危险等级</th>
@@ -54,6 +64,12 @@ export default {
                         </tbody>
                     </table>
                 </div>
+                
+                <div v-if="total > 0" class="flex justify-center items-center gap-2 my-4 py-2">
+                    <button @click="fetchVulns(currentPage - 1)" :disabled="currentPage <= 1" class="px-3 py-1.5 text-xs rounded-lg border transition-colors" :class="currentPage <= 1 ? 'border-slate-700 text-slate-600 cursor-not-allowed' : 'border-slate-600 text-slate-300 hover:bg-slate-700'">&laquo; 上一页</button>
+                    <span class="text-xs text-slate-400">第 {{ currentPage }} / {{ totalPages }} 页 (共 {{ total }} 条)</span>
+                    <button @click="fetchVulns(currentPage + 1)" :disabled="currentPage >= totalPages" class="px-3 py-1.5 text-xs rounded-lg border transition-colors" :class="currentPage >= totalPages ? 'border-slate-700 text-slate-600 cursor-not-allowed' : 'border-slate-600 text-slate-300 hover:bg-slate-700'">下一页 &raquo;</button>
+                </div>
             </div>
 
             <div v-if="selectedVuln" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
@@ -83,47 +99,51 @@ export default {
     setup(props) {
         const vulns = ref([]);
         const loading = ref(true);
+        const total = ref(0);
+        const currentPage = ref(1);
+        const pageSize = ref(20);
+        const totalPages = ref(1);
+        const filterSeverity = ref("");
         const selectedVuln = ref(null);
 
-        const fetchVulns = async () => {
+        const fetchVulns = async (page = 1) => {
             loading.value = true;
+            currentPage.value = page;
             try {
-                const res = await window.axios.get('/api/dashboard/vulnerabilities', {
-                    headers: { 'Authorization': `Bearer ${props.token}` }
+                const params = { page, page_size: pageSize.value };
+                if (filterSeverity.value) params.severity = filterSeverity.value;
+                const res = await window.axios.get("/api/dashboard/vulnerabilities", {
+                    params,
+                    headers: { "Authorization": `Bearer ${props.token}` }
                 });
-                vulns.value = res.data;
+                vulns.value = res.data.items || [];
+                total.value = res.data.total || 0;
+                totalPages.value = Math.max(1, Math.ceil(total.value / pageSize.value));
             } catch (error) {
-                console.error('获取漏洞列表失败:', error);
-                if(window.$toast) window.$toast('获取漏洞情报失败', 'error');
+                console.error("获取漏洞列表失败:", error);
+                if(window.$toast) window.$toast("获取漏洞情报失败", "error");
+                vulns.value = [];
+                total.value = 0;
             } finally {
                 loading.value = false;
             }
         };
 
-        const formatDate = (dateStr) => {
-            const d = new Date(dateStr);
-            return d.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit', second:'2-digit' });
-        };
+        const formatDate = (dateStr) => Utils.formatDate(dateStr, true);
 
         const getSeverityLabel = (severity) => {
-            const map = { critical: '致命', high: '高危', medium: '中危', low: '低危' };
+            const map = { critical: "致命", high: "高危", medium: "中危", low: "低危" };
             return map[severity.toLowerCase()] || severity;
         };
 
-        const getSeverityClass = (severity) => {
-            const s = severity.toLowerCase();
-            if (s === 'critical') return 'bg-rose-500/20 text-rose-300 border-rose-700/50';
-            if (s === 'high') return 'bg-orange-500/20 text-orange-300 border-orange-700/50';
-            if (s === 'medium') return 'bg-amber-500/20 text-amber-300 border-amber-700/50';
-            return 'bg-blue-500/20 text-blue-300 border-blue-700/50';
-        };
+        const getSeverityClass = (severity) => Utils.getSeverityClass(severity);
 
         const viewReport = (vuln) => {
             selectedVuln.value = vuln;
         };
 
         const renderMarkdown = (text) => {
-            if (!text) return '<p class="text-center opacity-50 my-10">暂无详细报告内容</p>';
+            if (!text) return "<p class=\"text-center opacity-50 my-10\">暂无详细报告内容</p>";
             return window.marked.parse(text);
         };
 
@@ -138,6 +158,10 @@ export default {
         return { 
             vulns, 
             loading, 
+            total,
+            currentPage,
+            totalPages,
+            filterSeverity,
             selectedVuln, 
             fetchVulns, 
             formatDate, 

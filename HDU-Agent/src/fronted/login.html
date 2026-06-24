@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,7 @@
     <script src="https://cdn.staticfile.net/axios/1.6.2/axios.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="./css/common.css">
     <style>
         * { font-family: 'Inter', sans-serif; }
         body {
@@ -20,65 +21,6 @@
             align-items: center;
             justify-content: center;
             padding: 1rem;
-        }
-
-        /* 粒子画布容器 */
-        #particle-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        [v-cloak] { display: none !important; }
-
-        /* 按钮扫光动画 */
-        .btn-shine {
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-shine::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.2) 30%, transparent 60%);
-            transform: rotate(25deg);
-            animation: shine 6s infinite linear;
-        }
-        @keyframes shine {
-            0% { transform: translateX(-100%) rotate(25deg); }
-            20% { transform: translateX(100%) rotate(25deg); }
-            100% { transform: translateX(200%) rotate(25deg); }
-        }
-
-        /* 卡片悬浮效果 */
-        .glass-card {
-            background: rgba(17, 25, 40, 0.75);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-
-        /* 输入框样式 */
-        .input-dark {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(71, 85, 105, 0.5);
-            color: #e2e8f0;
-            transition: all 0.2s;
-        }
-        .input-dark:focus {
-            outline: none;
-            border-color: #818cf8;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-        .input-dark::placeholder {
-            color: #64748b;
         }
     </style>
 </head>
@@ -139,75 +81,9 @@
     </div>
 
     <!-- 粒子动画脚本 (与 landing 一致) -->
-    <script>
-        (function() {
-            const canvas = document.getElementById('particle-canvas');
-            const ctx = canvas.getContext('2d');
-            let width, height;
-            let particles = [];
-
-            function initParticles() {
-                const count = Math.floor((width * height) / 12000);
-                particles = [];
-                for (let i = 0; i < count; i++) {
-                    particles.push({
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        radius: Math.random() * 2 + 1,
-                        speedX: (Math.random() - 0.5) * 0.3,
-                        speedY: (Math.random() - 0.5) * 0.3,
-                        color: `rgba(${99 + Math.floor(Math.random()*156)}, ${102 + Math.floor(Math.random()*100)}, ${241 + Math.floor(Math.random()*14)}, ${0.2 + Math.random()*0.3})`
-                    });
-                }
-            }
-
-            function resizeCanvas() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width;
-                canvas.height = height;
-                initParticles();
-            }
-
-            function drawParticles() {
-                ctx.clearRect(0, 0, width, height);
-                particles.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
-                    ctx.fill();
-
-                    p.x += p.speedX;
-                    p.y += p.speedY;
-
-                    if (p.x < 0 || p.x > width) p.speedX *= -1;
-                    if (p.y < 0 || p.y > height) p.speedY *= -1;
-                });
-
-                ctx.strokeStyle = 'rgba(139, 92, 246, 0.08)';
-                ctx.lineWidth = 0.5;
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx*dx + dy*dy);
-                        if (dist < 120) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-
-                requestAnimationFrame(drawParticles);
-            }
-
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-            drawParticles();
-        })();
-    </script>
+    <script src="./js/security.js"></script>
+    <script src="./js/particles.js"></script>
+    <script>Particles.init();</script>
 
     <!-- Vue 登录逻辑 (与原版完全一致) -->
     <script>
@@ -225,8 +101,8 @@
                     try {
                         const response = await axios.post('/api/auth/login', form.value);
                         if (response.data && response.data.access_token) {
-                            localStorage.setItem('hdu_token', response.data.access_token);
-                            localStorage.setItem('hdu_username', form.value.username);
+                            Security.plainSet('token', response.data.access_token);
+                            Security.plainSet('username', form.value.username);
                             window.location.href = 'index.html';
                         } else {
                             errorMsg.value = "服务器未返回有效的 Token，请联系管理员。";

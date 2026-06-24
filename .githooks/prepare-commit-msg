@@ -1,0 +1,26 @@
+#!/bin/bash
+# prepare-commit-msg hook: 自动生成中文 commit message 模板，便于审计代码变更
+#
+# 触发时机：git commit 时（编辑 commit message 之前）
+# 行为：分析 staged diff，生成结构化的中文 commit message 模板
+
+COMMIT_MSG_FILE="$1"
+COMMIT_SOURCE="$2"
+
+# 只在普通 commit（无 -m/-F，非 merge/squash/amend）时生成模板
+# COMMIT_SOURCE 为空 = 编辑器打开 = 需要模板
+# COMMIT_SOURCE=message = 使用了 -m/-F = 用户已提供消息，不覆盖
+if [ -z "$COMMIT_SOURCE" ]; then
+    PYTHON_BIN="$(git rev-parse --show-toplevel)/.venv/Scripts/python"
+    HOOK_SCRIPT="$(dirname "$0")/generate_cn_message.py"
+
+    if [ -f "$PYTHON_BIN" ] && [ -f "$HOOK_SCRIPT" ]; then
+        # 强制 UTF-8 编码，解决 Windows 下中文乱码问题
+        export PYTHONIOENCODING=utf-8
+        GENERATED=$("$PYTHON_BIN" "$HOOK_SCRIPT" 2>/dev/null)
+        if [ -n "$GENERATED" ]; then
+            # 将生成的模板写入 commit message 文件（UTF-8）
+            echo "$GENERATED" > "$COMMIT_MSG_FILE"
+        fi
+    fi
+fi

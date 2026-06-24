@@ -1,39 +1,73 @@
 # src/Agent/manager/nodes.py
-from typing import Optional
-from langchain_core.messages import SystemMessage, ToolMessage, AIMessage
+"""
+HDU-Agent 核心节点
+
+- analyzer_node: 意图拆解 + 标签提取
+- manager_node: 决策调度（决定分派给哪个子智能体或直接回复）
+"""
+from typing import Optional, List, Dict, Any
+from langchain_core.messages import (
+    SystemMessage, ToolMessage, AIMessage, HumanMessage, trim_messages
+)
 from .state import AgentState
 from src.core.llm_factory import get_llm
-from src.tools.registery import get_all_tools  # 引入工具注册表
-from src.config.settings import settings 
+from src.config.settings import settings
 from pydantic import BaseModel, Field
-from langchain_core.messages import HumanMessage
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import flag_modified
 from src.core.database import SessionLocal
-from src.core.models import User, AgentExperience  # 如果你的模型在 models.py 里
+from src.core.models import User, AgentExperience
+
+
+# ==================== 工具函数 ====================
+
 def get_dynamic_agent_experiences() -> str:
-    """从数据库获取 Manager 积累的子智能体经验"""
+    """从数据库获取累积的子智能体经验"""
     db: Session = SessionLocal()
     try:
         experiences = db.query(AgentExperience).all()
         if not experiences:
-            return "目前还没有积累使用经验，请根据各个工具的默认描述进行调用。"
-        
+            return "目前还没有累积使用经验，请根据需求合理调度子智能体。"
         exp_texts = []
         for exp in experiences:
-            exp_texts.append(f"- 【{exp.agent_name}】: 胜率(成功{exp.success_count}/失败{exp.fail_count})。\n  经验总结：{exp.learned_expertise}")
+            exp_texts.append(
+                f"- 【{exp.agent_name}】成功率(成功{exp.success_count}/失败{exp.fail_count})。\n"
+                f"  经验总结：{exp.learned_expertise}"
+            )
         return "\n".join(exp_texts)
     finally:
         db.close()
-# --- 1. 更新 Schema，增加 intent_tags ---
-class TaskBreakdown(BaseModel):
-    is_complex: bool = Field(description="该用户输入是否为一个需要拆解的复杂任务。普通问答请返回 False。")
-    analysis: str = Field(description="对用户意图的深度理解和测试策略分析")
-    steps: list[str] = Field(description="拆解出的具体执行步骤列表（如不需要拆解，可为空列表）")
-    # [新增] 自动提取画像标签
-    intent_tags: list[str] = Field(default_factory=list, description="从用户输入中提取的技能领域或关注点标签（如: web, sql注入, pwn, 提权等），最多提取3个核心词")
 
-# --- [新增] 画像自动落库辅助函数 ---
+
+def get_user_portrait_text(user_id: Optional[int]) -> str:
+    """获取用户画像文本"""
+    if not user_id:
+        return ""
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user or not user.portrait_data:
+            return ""
+        portrait = user.portrait_data
+        parts = []
+        if portrait.get("interest_tags"):
+            parts.append(f"- 关注领域：{', '.join(portrait['interest_tags'])}")
+        if portrait.get("skill_level"):
+            parts.append(f"- 技能水平：{portrait['skill_level']}")
+        return "\n".join(parts) if parts else ""
+    finally:
+        db.close()
+
+
+# ==================== Analyzer 节点 Schema ====================
+
+class TaskBreakdown(BaseModel):
+    is_complex: bool = Field(description="该用户输入是否为一个需要拆解的复杂任务。")
+    analysis: str = Field(description="对用户意图的深度理解和策略分析")
+    steps: list[str] = Field(description="拆解出的具体执行步骤列表")
+    intent_tags: list[str] = Field(default_factory=list, description="技能领域标签（web/pwn/pentest/ctf等），最多3个")
+
+
 def auto_update_portrait_tags(user_id: int, new_tags: list):
     if not user_id or not new_tags:
         return
@@ -43,233 +77,315 @@ def auto_update_portrait_tags(user_id: int, new_tags: list):
         if user:
             portrait = user.portrait_data or {}
             existing_tags = portrait.get("interest_tags", [])
-            
-            # 合并并去重，同时限制最多保留最近的 15 个标签（防上下文爆炸）
             updated_tags = list(dict.fromkeys(existing_tags + new_tags))[-15:]
             portrait["interest_tags"] = updated_tags
-            
-            # 顺便提升一点活跃度
             portrait["activity_score"] = portrait.get("activity_score", 0) + 1
-            
             user.portrait_data = portrait
             flag_modified(user, "portrait_data")
             db.commit()
     except Exception as e:
-        print(f"⚠️ 更新用户画像失败: {e}")
+        print(f"\u26a0\ufe0f 更新用户画像失败: {e}")
     finally:
         db.close()
 
-# --- 2. 修改 analyzer_node ---
+
+# ==================== Manager 调度决策 Schema ====================
+
+class DispatchDecision(BaseModel):
+    """Manager 的结构化调度决策"""
+    situation_analysis: str = Field(description="对当前执行上下文的分析：用户意图、当前进展、上一步结果")
+    dispatch_target: Optional[str] = Field(
+        default=None,
+        description="调度的子智能体名称：'recon_agent' / 'web_agent' / 'exploit_agent' / 'code_audit_agent' / 'binary_agent' / 'internal_agent' / 'report_agent'。不需要调度时为 null"
+    )
+    task_instruction: str = Field(
+        default="",
+        description="给子智能体的具体任务指令（清晰描述目标、范围、期望输出）"
+    )
+    reasoning: str = Field(description="为什么选择这个子智能体（或不调度）的推理过程")
+    is_task_complete: bool = Field(description="任务是否已完成，无需进一步行动")
+
+
+# ==================== 子智能体选择指南 ====================
+
+SUBAGENT_SELECTION_GUIDE = """
+## 可用子智能体及适用场景
+
+### recon_agent（信息收集子智能体）
+- 适用：端口扫描、服务枚举、DNS侦察、子域名发现、OS指纹识别、资产清单
+- 不适用：漏洞利用、代码分析、Web漏洞扫描
+- 典型作为攻击链第一阶段
+
+### web_agent（Web安全子智能体）
+- 适用：Web漏洞扫描（SQL注入/XSS/CSRF/SSRF等）、Web指纹识别、API安全测试、Web配置审计
+- 不适用：二进制逆向、系统提权、内网渗透
+- 需要recon_agent提供Web服务信息作为输入
+
+### exploit_agent（漏洞利用子智能体）
+- 适用：漏洞验证与复现、Exploit开发、Payload生成、权限提升
+- 不适用：初始侦察、代码审计
+- 依赖上游智能体（web/code_audit/binary）提供漏洞信息
+
+### code_audit_agent（代码审计子智能体）
+- 适用：源代码安全审查、依赖漏洞检查、硬编码密钥发现、不安全配置检测
+- 不适用：运行时渗透、端口扫描
+- 可直接调度或由其他智能体触发
+
+### binary_agent（二进制安全子智能体）
+- 适用：逆向工程、缓冲区溢出、ROP链构造、Shellcode编写
+- 不适用：Web安全、内网渗透
+- 需要二进制文件作为输入
+
+### internal_agent（内网渗透子智能体）
+- 适用：横向移动、域攻击、凭据窃取、持久化、痕迹清理
+- 不适用：外网侦察、Web扫描
+- 依赖exploit_agent获得初始立足点
+
+### report_agent（报告生成子智能体）
+- 适用：汇总所有发现、生成结构化渗透测试报告
+- 不适用：执行任何安全测试操作
+- 应在所有安全测试完成后最后调度
+
+### pentest_agent（通用渗透测试子智能体）
+- 适用：跨领域渗透测试任务、未明确归类的安全需求、非标准安全测试
+- 不适用：无明显限制（作为通用回退选项）
+- 当任务无法明确归入其他专项智能体时使用
+
+## 典型攻击链流水线
+1. recon_agent（侦察）-> 2. web_agent/code_audit_agent/binary_agent（漏洞发现）-> 3. exploit_agent（利用）-> 4. internal_agent（内网渗透）-> 5. report_agent（报告）
+
+## 调度原则
+1. 任务明确对应某一子智能体 -> 直接调度该智能体
+2. 任务模糊 -> 优先调度 recon_agent 做信息收集
+3. 简单咨询/问答 -> 不调度，直接回复
+4. 所有安全测试完成后 -> 调度 report_agent 生成报告
+5. 前一步结果需要同类型深入 -> 可重复调度同一智能体
+"""
+
+
+# ==================== 上下文窗口管理 ====================
+
+def trim_conversation_context(messages: list) -> list:
+    """裁剪消息列表，保留 SystemMessage + 最近 15 条非系统消息"""
+    system_msgs = [m for m in messages if isinstance(m, SystemMessage)]
+    non_system = [m for m in messages if not isinstance(m, SystemMessage)]
+    trimmed = system_msgs + non_system[-15:]
+    return trimmed
+
+
+# ==================== Analyzer 节点 ====================
+
 def analyzer_node(state: AgentState):
-    """意图拆解节点：在执行任务前，先拆分为多个可执行步骤，并提取画像标签"""
-    messages = state.get('messages', [])
-    if not messages: return {}
-    last_message = messages[-1]
-    if not isinstance(last_message, HumanMessage): return {}
+    """
+    意图分析节点 - 拆解用户任务并提取领域标签。
+    """
+    messages = state.get("messages", [])
+    if not messages:
+        return {"intent_analysis": "无用户输入", "task_plan": [], "task_context_tags": []}
 
-    current_provider = state.get("current_provider") or settings.DEFAULT_PROVIDER
-    current_model = state.get("current_model") or settings.DEFAULT_MODEL
-    user_key = state.get('user_api_keys', {}).get(current_provider)
-    
-    llm = get_llm(provider=current_provider, model_name=current_model, api_key=user_key)
-    structured_llm = llm.with_structured_output(TaskBreakdown)
-
-    prompt = SystemMessage(content=(
-        "你是一个高级网络安全架构师。分析用户的最新输入。"
-        "1. 如果是复杂任务，请拆解为步骤 (is_complex=True)。"
-        "2. 无论是否复杂，请提取用户当前关注的技术领域或知识点标签填入 intent_tags。"
-    ))
-
-    try:
-        result = structured_llm.invoke([prompt, last_message])
-        
-        # [新增] 异步/后台更新用户画像（利用刚刚写好的辅助函数）
-        if result.intent_tags and state.get("user_id"):
-            print(f"🏷️ [Analyzer] 捕获到用户特征标签: {result.intent_tags}")
-            auto_update_portrait_tags(state["user_id"], result.intent_tags)
-
-        if result.is_complex and result.steps:
-            # ... 保持原有的拆解拼装代码 ...
-            plan_text = f"**💡 意图理解与任务拆解**\n\n**分析:** {result.analysis}\n\n**执行计划:**\n"
-            for i, step in enumerate(result.steps): plan_text += f"{i+1}. {step}\n"
-            return {"intent_analysis": result.analysis, "task_plan": result.steps, "messages": [AIMessage(content=plan_text)]}
-        else:
-            return {"task_plan": []} 
-    except Exception as e:
+    user_messages = [m for m in messages if isinstance(m, HumanMessage)]
+    if not user_messages:
         return {}
 
+    latest_user_msg = user_messages[-1]
+    user_id = state.get("user_id")
+    current_provider = state.get("current_provider", settings.DEFAULT_PROVIDER)
+    current_model = state.get("current_model", settings.DEFAULT_MODEL)
 
-def get_user_portrait_context(user_id: int) -> str:
-    """从数据库获取当前用户的画像并转化为自然语言上下文"""
-    if not user_id:
-        return ""
-    
-    db = SessionLocal()
+    llm = get_llm(provider=current_provider, model=current_model)
+    structured_llm = llm.with_structured_output(TaskBreakdown)
+
+    system_prompt = SystemMessage(content="""你是一个安全任务分析器。分析用户输入，判断是否为需要拆解的复杂任务。
+
+对于复杂任务（渗透测试、安全审计、漏洞挖掘等）：
+- is_complex: true
+- analysis: 深度理解用户意图
+- steps: 拆解为3-7个具体步骤
+- intent_tags: 提取领域标签（web/pwn/pentest/ctf/recon/exploit/binary/code_audit/internal/report 等），最多3个
+
+对于简单任务（询问、闲聊、单一操作）：
+- is_complex: false
+- analysis: 简要说明用户需求
+- steps: 空列表
+- intent_tags: 空列表
+""")
+
     try:
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user or not user.portrait_data:
-            return ""
-        
-        p_data = user.portrait_data
-        tech_stack = ", ".join(p_data.get("tech_stack", [])) or "未知"
-        interest_tags = ", ".join(p_data.get("interest_tags", [])) or "无"
-        risk_level = p_data.get("risk_level", "low")
-        
-        return (
-            "=====================\n"
-            "【当前交互用户的画像与偏好】\n"
-            f"- 擅长领域/技术栈: {tech_stack}\n"
-            f"- 近期兴趣/意图标签: {interest_tags}\n"
-            f"- 账号风控等级: {risk_level}\n"
-            "-> 请结合该用户的画像调整你的沟通策略：对于其擅长的领域可直接深入原理或执行高级测试；若涉及其不熟悉的领域标签，请在结果中补充基础科普。\n"
-            "=====================\n"
-        )
+        breakdown: TaskBreakdown = structured_llm.invoke([system_prompt, latest_user_msg])
+        print(f"\ud83d\udd0d [Analyzer] 任务分析: complex={breakdown.is_complex}, tags={breakdown.intent_tags}")
+
+        # 更新用户画像标签
+        if user_id and breakdown.intent_tags:
+            auto_update_portrait_tags(user_id, breakdown.intent_tags)
+
+        if breakdown.is_complex:
+            return {
+                "intent_analysis": breakdown.analysis,
+                "task_plan": breakdown.steps,
+                "task_context_tags": breakdown.intent_tags,
+            }
+        else:
+            return {
+                "intent_analysis": breakdown.analysis,
+                "task_plan": [],
+                "task_context_tags": [],
+            }
+
     except Exception as e:
-        print(f"⚠️ 获取用户画像上下文失败: {e}")
-        return ""
-    finally:
-        db.close()
-
-
-# --- 3. 完整修改后的 manager_node ---
-def manager_node(state: AgentState):
-    """主智能体节点：处理失败回退询问逻辑"""
-    messages = state['messages']
-    user_api_keys = state.get('user_api_keys', {})
-    
-    current_provider = state.get("current_provider") or settings.DEFAULT_PROVIDER
-    current_model = state.get("current_model") or settings.DEFAULT_MODEL
-    user_key = user_api_keys.get(current_provider)
-    
-    llm = get_llm(provider=current_provider, model_name=current_model, api_key=user_key)
-
-    # --- 获取各种上下文（经验、画像、计划）---
-    history_experience = get_dynamic_agent_experiences()
-    portrait_context = get_user_portrait_context(state.get("user_id"))
-
-    task_plan = state.get("task_plan")
-    plan_context = ""
-    if task_plan:
-        plan_context = "\n=====================\n【全局任务拆解计划】\n"
-        for i, step in enumerate(task_plan):
-            plan_context += f"{i+1}. {step}\n"
-        plan_context += "-> 请严格参考以上计划评估当前进度，并调用对应的工具推进下一步。\n=====================\n"
-
-    # --- [新增] 处理工具失败逻辑 ---
-    last_tool_status = state.get("last_tool_status")
-    force_ask_user = (last_tool_status == "failure")
-
-    # 基础 System Prompt
-    system_prompt_content = (
-        "你是自动化安全测试系统 HDU-Agent 的主控智能体（Manager）。\n"
-        "你的任务是理解用户意图，并准确地将任务分发给最合适的子智能体（工具）。\n\n"
-        f"{portrait_context}"
-        f"{plan_context}"
-        "=====================\n"
-        "【你的长期记忆：各子智能体特长总结】\n"
-        f"{history_experience}\n"
-        "=====================\n\n"
-        "【你的行为准则】\n"
-        "1. 分发任务：请严格参考上述经验记忆和【全局任务拆解计划】，选择最合适的工具去执行。\n"
-        "2. 沟通语气：务必参考【当前交互用户的画像与偏好】调整回复风格。\n"
-        "3. 直接对话：如果任务已完成，或者只是回答用户的普通问题，请直接用自然语言回复。"
-    )
-
-    # [新增] 如果上一步工具执行失败，追加特殊指令
-    if force_ask_user:
-        system_prompt_content += (
-            "\n\n【!!! 重要 !!!】\n"
-            "你上一次调用的工具执行失败了。"
-            "此时你**绝对不能**自动选择另一个工具。"
-            "请用自然语言向用户报告失败情况，并明确询问用户下一步意图（例如：是否重试？是否换用其他方法？或是否终止任务？）。"
-        )
-        # 失败时不绑定工具，强制 LLM 只能文本回复
-        llm_to_use = llm
-    else:
-        # 正常情况绑定所有工具
-        llm_to_use = llm.bind_tools(get_all_tools())
-
-    system_prompt = SystemMessage(content=system_prompt_content)
-    
-    print(f"🧠 [Manager] 正在思考 (引擎: {current_provider} / {current_model})...")
-    if force_ask_user:
-        print("⚠️ [Manager] 检测到上一次工具执行失败，已限制工具调用，将要求 LLM 询问用户。")
-
-    response = llm_to_use.invoke([system_prompt] + messages)
-
-    # 返回时清除状态（避免影响下一次正常流程）
-    return {
-        "messages": [response],
-        "last_tool_status": None   # 重置状态，下次调用前为 None
-    }
-
-def pentest_agent_node(state: AgentState):
-    """工具执行节点：执行 Tool Call 并标记执行状态"""
-    last_message = state['messages'][-1]
-
-    if not isinstance(last_message, AIMessage) or not last_message.tool_calls:
+        print(f"\u26a0\ufe0f [Analyzer] 分析失败: {e}")
         return {
-            "messages": [SystemMessage(content="错误：未检测到合法的工具调用指令。")],
-            "last_tool_status": "failure"   # 未调用工具也视为失败
+            "intent_analysis": "分析失败，交给 Manager 直接处理",
+            "task_plan": [],
+            "task_context_tags": [],
         }
 
-    tool_call = last_message.tool_calls[0]
-    tool_name = tool_call["name"]
-    tool_args = tool_call["args"]
-    tool_call_id = tool_call["id"]
 
-    tools = {t.name: t for t in get_all_tools()}
-    selected_tool = tools.get(tool_name)
+# ==================== Manager 节点 ====================
 
-    if not selected_tool:
-        result_message = f"错误：找不到名为 {tool_name} 的工具。"
-        status = "failure"
-    else:
-        print(f"🔧 [Tool Executor] 正在执行工具 {tool_name}，参数: {tool_args}")
-        try:
-            result_message = selected_tool.invoke(tool_args)
-            # 判断结果是否包含失败关键词（可根据实际返回结构调整）
-            if any(keyword in str(result_message).lower() for keyword in ["失败", "错误", "error", "failed"]):
-                status = "failure"
-            else:
-                status = "success"
-        except Exception as e:
-            result_message = f"工具执行时发生异常：{str(e)}"
-            status = "failure"
+def manager_node(state: AgentState):
+    """
+    Manager 决策节点 - 调度子智能体或直接回复用户。
 
-    tool_msg = ToolMessage(
-        content=str(result_message),
-        tool_call_id=tool_call_id,
-        name=tool_name
-    )
+    流程：
+    1. 上下文分析（任务计划、上一步结果、用户画像）
+    2. 消息裁剪（防上下文爆炸）
+    3. LLM 结构化解码 -> DispatchDecision
+    4. 按决策设置 subagent_dispatch
+    """
+    messages = state.get("messages", [])
+    if not messages:
+        return {}
 
-    return {
-        "messages": [tool_msg],
-        "last_tool_status": status   # 传递状态
+    user_id = state.get("user_id")
+    task_plan = state.get("task_plan", [])
+    task_tags = state.get("task_context_tags", [])
+    decision_history = state.get("decision_history", [])
+    current_goal = state.get("current_goal", "")
+    current_provider = state.get("current_provider", settings.DEFAULT_PROVIDER)
+    current_model = state.get("current_model", settings.DEFAULT_MODEL)
+
+    llm = get_llm(provider=current_provider, model=current_model)
+    structured_llm = llm.with_structured_output(DispatchDecision)
+
+    # ===== 上下文裁剪 =====
+    trimmed_messages = trim_conversation_context(messages)
+    if len(trimmed_messages) < len(messages):
+        print(f"\ud83d\udce6 [Manager] 消息裁剪: {len(messages)} -> {len(trimmed_messages)}")
+
+    # ===== 构建 System Prompt =====
+    prompt_parts = [
+        "你是一个网络安全专家调度智能体（Manager）。你的职责是分析当前对话状态，决定下一步行动。",
+        "",
+        "## 你可以做的两件事",
+        "1. **调度子智能体**：将任务分派给 recon_agent / web_agent / exploit_agent / code_audit_agent / binary_agent / internal_agent / report_agent",
+        "2. **直接回复用户**：如果任务已完成或只是咨询问题，直接回答",
+        "",
+        SUBAGENT_SELECTION_GUIDE,
+    ]
+
+    # 用户画像
+    portrait = get_user_portrait_text(user_id)
+    if portrait:
+        prompt_parts.extend(["", "## 当前用户画像", portrait])
+
+    # 任务计划
+    if task_plan:
+        plan_text = "\n".join([f"  {i+1}. {s}" for i, s in enumerate(task_plan)])
+        prompt_parts.extend(["", f"## 任务执行计划\n{plan_text}"])
+
+    if current_goal:
+        prompt_parts.extend(["", f"## 当前目标\n{current_goal}"])
+
+    # 任务标签
+    if task_tags:
+        prompt_parts.extend(["", f"## 任务领域标签\n{', '.join(task_tags)}"])
+
+    # 历史决策
+    if decision_history:
+        hist_lines = []
+        for d in decision_history[-3:]:
+            hist_lines.append(
+                f"- 调度: {d.get('dispatch', 'N/A')} | "
+                f"理由: {d.get('reasoning', '')[:60]}"
+            )
+        prompt_parts.extend(["", "## 最近调度记录", "\n".join(hist_lines)])
+
+    # 子智能体经验
+    experiences = get_dynamic_agent_experiences()
+    if experiences and "还没有累积" not in experiences:
+        prompt_parts.extend(["", f"## 子智能体历史经验\n{experiences}"])
+
+    # 子智能体结果
+    subagent_results = state.get("subagent_results", [])
+    if subagent_results:
+        result_lines = ["## 最近子智能体执行结果"]
+        for r in subagent_results[-3:]:  # Last 3 results
+            agent = r.get("agent_name", "unknown")
+            status = r.get("status", "?")
+            summary = r.get("summary", "")[:200]
+            findings_count = len(r.get("findings", []))
+            result_lines.append(f"- [{agent}] ({status}): {summary}")
+            if findings_count:
+                result_lines.append(f"  发现 {findings_count} 项")
+            error = r.get("error")
+            if error:
+                result_lines.append(f"  错误: {error}")
+        prompt_parts.extend(["", "\n".join(result_lines)])
+
+        system_prompt = SystemMessage(content="\n".join(prompt_parts))
+
+    # ===== LLM 调度决策 =====
+    print(f"\ud83e\udde0 [Manager] 正在决策调度... ({current_provider}/{current_model})")
+
+    try:
+        decision: DispatchDecision = structured_llm.invoke([system_prompt] + trimmed_messages)
+    except Exception as e:
+        print(f"\u26a0\ufe0f [Manager] 结构化决策失败，降级为直接回复: {e}")
+        response = llm.invoke([system_prompt] + trimmed_messages)
+        return {
+            "messages": [response],
+            "subagent_dispatch": "",
+        }
+
+    # ===== 处理决策 =====
+    print(f"\ud83d\udce3 [Manager] 决策: dispatch={decision.dispatch_target}, complete={decision.is_task_complete}")
+
+    # 记录决策历史
+    new_decision = {
+        "dispatch": decision.dispatch_target or "direct_reply",
+        "reasoning": decision.reasoning,
     }
+    updated_history = (decision_history or []) + [new_decision]
 
-async def analyze_user_intent(state: AgentState):
-    """
-    专门负责分析用户意图并生成标签的节点
-    """
-    llm = get_llm() # 获取当前配置的 LLM
-    
-    # 构造意图识别的 Prompt
-    intent_prompt = """
-    你是一个安全专家助手。请分析用户的最新输入，并输出对应的意图标签（JSON格式）。
-    可选标签体系：
-    - 领域: web, pwn, reverse, crypto, mobile, misc
-    - 行为: scan, exploit, audit, learn, troubleshoot
-    - 风险: low, medium, high
-    
-    输出示例: {"tags": ["web", "scan"], "risk": "low", "summary": "用户想要扫描Web目标"}
-    """
-    
-    last_message = state["messages"][-1].content
-    response = await llm.ainvoke([
-        {"role": "system", "content": intent_prompt},
-        {"role": "user", "content": last_message}
-    ])
-    
-    # 将分析结果存入 state
-    return {"intent_analysis": response.content}
+    if decision.is_task_complete or decision.dispatch_target is None:
+        # 任务完成 / 直接回复
+        print("\u2705 [Manager] 任务完成或直接回复用户")
+        final_prompt = SystemMessage(content=(
+            "你是安全专家助手。根据以下决策分析，用自然友好的语言回复用户。\n"
+            f"分析：{decision.situation_analysis}\n"
+            "回复要简洁、专业、可操作。"
+        ))
+        response = llm.invoke([final_prompt] + trimmed_messages)
+        return {
+            "messages": [response],
+            "subagent_dispatch": "",
+            "decision_history": updated_history,
+            "execution_phase": "complete",
+        }
+    else:
+        # 调度子智能体
+        print(f"\ud83d\ude80 [Manager] 调度 {decision.dispatch_target}，指令: {decision.task_instruction[:80]}...")
+        dispatch_msg = AIMessage(content=(
+            f"\ud83d\udd00 [调度决策] 分派给 {decision.dispatch_target}\n"
+            f"推理：{decision.reasoning}\n"
+            f"任务指令：{decision.task_instruction}"
+        ))
+        task_msg = HumanMessage(content=decision.task_instruction)
+
+        return {
+            "messages": [dispatch_msg, task_msg],
+            "subagent_dispatch": decision.dispatch_target,
+            "task_instruction": decision.task_instruction,
+            "decision_history": updated_history,
+            "execution_phase": "executing",
+        }

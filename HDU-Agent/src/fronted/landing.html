@@ -5,88 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>凌霄 · 云端渗透作战平台</title>
 
-    <!-- Tailwind CSS & 字体 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- 自定义样式与动画 -->
+    <link rel="stylesheet" href="./css/common.css">
     <style>
         * { font-family: 'Inter', sans-serif; }
         body { background: #0b0f19; }
-
-        /* 粒子画布容器 */
-        #particle-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* 渐变文字效果 */
-        .text-gradient {
-            background: linear-gradient(135deg, #a5f3fc 0%, #c084fc 50%, #f472b6 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* 卡片悬停光效 */
-        .hover-glow {
-            transition: all 0.3s ease;
-        }
-        .hover-glow:hover {
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
-            transform: translateY(-5px);
-            border-color: rgba(139, 92, 246, 0.5);
-        }
-
-        /* 按钮扫光动画 */
-        .btn-shine {
-            position: relative;
-            overflow: hidden;
-        }
+        /* landing version: brighter shine */
         .btn-shine::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
             background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.3) 30%, transparent 60%);
-            transform: rotate(25deg);
-            animation: shine 6s infinite linear;
-        }
-        @keyframes shine {
-            0% { transform: translateX(-100%) rotate(25deg); }
-            20% { transform: translateX(100%) rotate(25deg); }
-            100% { transform: translateX(200%) rotate(25deg); }
-        }
-
-        /* 数据数字滚动效果（简单模拟） */
-        .stat-number {
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* 缓慢浮动动画 */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        .float-animation {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        /* 隐藏滚动条但保留功能 */
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
         }
     </style>
 </head>
@@ -388,73 +315,6 @@
 
     <!-- 粒子动画脚本 -->
     <script>
-        (function() {
-            const canvas = document.getElementById('particle-canvas');
-            const ctx = canvas.getContext('2d');
-            let width, height;
-            let particles = [];
-
-            function initParticles() {
-                const count = Math.floor((width * height) / 12000);
-                particles = [];
-                for (let i = 0; i < count; i++) {
-                    particles.push({
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        radius: Math.random() * 2 + 1,
-                        speedX: (Math.random() - 0.5) * 0.3,
-                        speedY: (Math.random() - 0.5) * 0.3,
-                        color: `rgba(${99 + Math.floor(Math.random()*156)}, ${102 + Math.floor(Math.random()*100)}, ${241 + Math.floor(Math.random()*14)}, ${0.2 + Math.random()*0.3})`
-                    });
-                }
-            }
-
-            function resizeCanvas() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width;
-                canvas.height = height;
-                initParticles();
-            }
-
-            function drawParticles() {
-                ctx.clearRect(0, 0, width, height);
-                particles.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
-                    ctx.fill();
-
-                    p.x += p.speedX;
-                    p.y += p.speedY;
-
-                    if (p.x < 0 || p.x > width) p.speedX *= -1;
-                    if (p.y < 0 || p.y > height) p.speedY *= -1;
-                });
-
-                ctx.strokeStyle = 'rgba(139, 92, 246, 0.08)';
-                ctx.lineWidth = 0.5;
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx*dx + dy*dy);
-                        if (dist < 120) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-
-                requestAnimationFrame(drawParticles);
-            }
-
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-            drawParticles();
-        })();
     </script>
 
     <!-- 漏洞情报滚动脚本 (优化版：分页滚动 + 动态指示点) -->
@@ -605,7 +465,6 @@
         });
     })();
 </script>
-    </script>
 
     <!-- 动态数据获取 (可选对接后端公开接口) -->
     <script>
@@ -631,5 +490,7 @@
         })();
     </script>
 
+    <script src="./js/particles.js"></script>
+    <script>Particles.init();</script>
 </body>
 </html>

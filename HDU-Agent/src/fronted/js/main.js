@@ -1,15 +1,18 @@
 import Dashboard from './components/Dashboard.js';
 import ChatTerminal from './components/ChatTerminal.js';
 import VulnList from './components/VulnList.js';
+import TaskScheduler from './components/TaskScheduler.js';
+import SkeletonLoader from './components/SkeletonLoader.js';
 
-const { createApp, ref, onMounted } = window.Vue;
+const { createApp, ref, onMounted, onBeforeUnmount } = window.Vue;
 
 const app = createApp({
     setup() {
-        const username = ref(localStorage.getItem('hdu_username') || 'Operator');
-        const token = ref(localStorage.getItem('hdu_token'));
+        const username = ref(Security.plainGet('username') || 'Operator');
+        const token = ref(Security.plainGet('token'));
         
         if (!token.value) {
+            Security.clearAll();
             window.location.href = 'login.html';
         }
 
@@ -32,10 +35,20 @@ const app = createApp({
         };
         window.$toast = showToast;
 
-        const generateId = () => `chat_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
-        const currentSessionId = ref(localStorage.getItem('hdu_session_id') || generateId());
+        const generateId = () => Utils.generateId('chat');
+        const currentSessionId = ref(Security.plainGet('session_id') || generateId());
         const sessionsList = ref([]);
         const currentTab = ref('dashboard');
+        
+        // Hash-based routing
+        const syncTabFromHash = () => {
+            const hash = window.location.hash.replace('#', '');
+            if (['dashboard', 'chat', 'vulns', 'schedule'].includes(hash)) {
+                currentTab.value = hash;
+            }
+        };
+        syncTabFromHash();
+        window.addEventListener('hashchange', syncTabFromHash);
         
         const isConnected = ref(false);
         const statusText = ref('离线');
@@ -52,58 +65,79 @@ const app = createApp({
 
         const agentConfigs = ref({
             global: { 
-                provider: localStorage.getItem(`hdu_provider_${username.value}`) || 'deepseek', 
-                model: localStorage.getItem(`hdu_model_${username.value}`) || 'deepseek-chat', 
-                apiKey: localStorage.getItem(`hdu_api_key_${username.value}`) || '' 
+                provider: Security.plainGet('provider_' + username.value) || 'deepseek', 
+                model: Security.plainGet('model_' + username.value) || 'deepseek-chat', 
+                apiKey: ''
             },
             pentest_agent: { provider: 'openai', model: 'gpt-4o', apiKey: '' },
             pentagi: { provider: 'openai', model: 'gpt-4-turbo', apiKey: '' },
             ctf_agent: { provider: 'openai', model: 'gpt-4o', apiKey: '' }
         });
 
+        // Config modal state
+        const configSaving = ref(false);
+        const configSaved = ref(false);
+        const configError = ref('');
+
         const switchConfigTab = async (tabId) => {
             activeConfigTab.value = tabId;
             showApiKey.value = false;
-            if (tabId !== 'global') {
+            configSaved.value = false;
+            configError.value = '';
+            if (tabId === 'global') {
+                var key = await Security.secureGet('api_key_' + username.value);
+                if (key) agentConfigs.value.global.apiKey = key;
+            } else {
                 try {
-                    const res = await window.axios.get(`/api/agents/config/${tabId}`, {
-                        headers: { 'Authorization': `Bearer ${token.value}` }
+                    var res = await window.axios.get('/api/agents/config/' + tabId, {
+                        headers: { 'Authorization': 'Bearer ' + token.value }
                     });
                     if (res.data) {
                         agentConfigs.value[tabId].model = res.data.model || agentConfigs.value[tabId].model;
-                        agentConfigs.value[tabId].apiKey = res.data.api_key || agentConfigs.value[tabId].apiKey;
+                        agentConfigs.value[tabId].apiKey = res.data.api_key || '';
+                        agentConfigs.value[tabId].provider = res.data.provider || agentConfigs.value[tabId].provider;
                     }
                 } catch (error) {
-                    console.warn(`未拉取到 ${tabId} 的历史配置，使用默认值`);
+                    // Server config not available, use defaults silently
                 }
             }
         };
 
         const openConfigModal = () => {
             showConfigModal.value = true;
-            switchConfigTab('global'); 
+            configSaved.value = false;
+            configError.value = '';
+            switchConfigTab('global');
         };
 
         const saveCurrentConfig = async () => {
-            const tabId = activeConfigTab.value;
-            const config = agentConfigs.value[tabId];
+            var tabId = activeConfigTab.value;
+            var config = agentConfigs.value[tabId];
+            configSaving.value = true;
+            configSaved.value = false;
+            configError.value = '';
 
-            if (tabId === 'global') {
-                localStorage.setItem(`hdu_provider_${username.value}`, config.provider);
-                localStorage.setItem(`hdu_model_${username.value}`, config.model);
-                localStorage.setItem(`hdu_api_key_${username.value}`, config.apiKey);
-                showToast('主控节点配置已保存至本地缓存！', 'success');
-            } else {
-                try {
+            try {
+                if (tabId === 'global') {
+                    Security.plainSet('provider_' + username.value, config.provider);
+                    Security.plainSet('model_' + username.value, config.model);
+                    await Security.secureSet('api_key_' + username.value, config.apiKey);
+                } else {
                     await window.axios.post('/api/agents/config', {
                         agent_name: tabId,
                         model: config.model,
-                        api_key: config.apiKey
-                    }, { headers: { 'Authorization': `Bearer ${token.value}` } });
-                    showToast(`[${agentTabs.find(t=>t.id===tabId).name}] 配置已同步至服务端！`, 'success');
-                } catch (error) {
-                    showToast(`保存 ${tabId} 配置失败，请检查网络`, 'error');
+                        api_key: config.apiKey,
+                        provider: config.provider
+                    }, { headers: { 'Authorization': 'Bearer ' + token.value } });
                 }
+                configSaved.value = true;
+                setTimeout(function() { configSaved.value = false; }, 3000);
+            } catch (error) {
+                var msg = error.response?.data?.detail || error.message || 'Network error';
+                configError.value = '保存失败: ' + msg;
+                console.error('配置保存失败:', error);
+            } finally {
+                configSaving.value = false;
             }
         };
 
@@ -125,9 +159,20 @@ const app = createApp({
             }
         };
 
+                const formatSessionTime = (ts) => {
+            if (!ts) return '';
+            var d = typeof ts === 'number' ? new Date(ts * 1000) : new Date(ts);
+            var now = new Date();
+            var diff = now - d;
+            if (diff < 60000) return '刚刚';
+            if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+            if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+            return d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+        };
+
         const createNewChat = () => {
             currentSessionId.value = generateId();
-            localStorage.setItem('hdu_session_id', currentSessionId.value);
+            Security.plainSet('session_id', currentSessionId.value);
             currentTab.value = 'chat';
             sessionsList.value.unshift({
                 session_id: currentSessionId.value,
@@ -138,28 +183,49 @@ const app = createApp({
 
         const switchSession = (id) => {
             currentSessionId.value = id;
-            localStorage.setItem('hdu_session_id', id);
+            Security.plainSet('session_id', id);
             currentTab.value = 'chat';
         };
 
-        const switchTab = (tab) => { currentTab.value = tab; };
+        const switchTab = (tab) => { window.location.hash = tab; };
+
+        // Keyboard shortcuts
+        const handleKeydown = (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case '1': e.preventDefault(); switchTab('dashboard'); break;
+                    case '2': e.preventDefault(); switchTab('chat'); break;
+                    case '3': e.preventDefault(); switchTab('vulns'); break;
+                    case '4': e.preventDefault(); switchTab('schedule'); break;
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKeydown);
 
         const handleLogout = () => {
-            localStorage.clear();
+            Security.clearAll();
             window.location.href = 'login.html';
         };
 
-        onMounted(() => { fetchSessions(); });
+        onMounted(() => {
+            fetchSessions();
+            syncTabFromHash();
+        });
+        onBeforeUnmount(() => {
+            window.removeEventListener('hashchange', syncTabFromHash);
+            window.removeEventListener('keydown', handleKeydown);
+        });
 
         return {
             token, username, currentTab, currentSessionId, sessionsList,
             isConnected, statusText, handleConnectionUpdate,
-            switchTab, switchSession, createNewChat, fetchSessions, handleLogout,
+            switchTab, switchSession, createNewChat, fetchSessions, handleLogout, formatSessionTime,
             
             showConfigModal, activeConfigTab, agentTabs, agentConfigs,
             openConfigModal, switchConfigTab, saveCurrentConfig, closeConfigModal,
 
-            mobileMenuOpen, showApiKey, toasts
+            mobileMenuOpen, showApiKey, toasts,
+            configSaving, configSaved, configError
         };
     }
 });
@@ -167,5 +233,7 @@ const app = createApp({
 app.component('dashboard', Dashboard);
 app.component('chat-terminal', ChatTerminal);
 app.component('vuln-list', VulnList);
+app.component('task-scheduler', TaskScheduler);
+app.component('skeleton-loader', SkeletonLoader);
 
 app.mount('#app');

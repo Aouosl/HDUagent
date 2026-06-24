@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -6,21 +6,24 @@
     <title>凌霄 | 云端作战控制台</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.staticfile.net/vue/3.3.4/vue.global.min.js"></script>
-    <script src="https://cdn.staticfile.net/axios/1.6.2/axios.min.js"></script>
-    <script src="https://cdn.staticfile.net/marked/9.1.6/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ansi_up@5.1.0/ansi_up.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.2/dist/axios.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/ansi_up@5.1.0/ansi_up.min.js"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.staticfile.net/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <script src="https://cdn.staticfile.net/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.cn" crossorigin>
+    <link href="https://fonts.googleapis.cn/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
 
+    <link rel="stylesheet" href="./css/common.css">
     <style>
-        [v-cloak] { display: none !important; }
-        
         body { 
-            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif; 
+            font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', system-ui, -apple-system, sans-serif; 
             height: 100vh; 
             display: flex; 
             flex-direction: column; 
@@ -29,79 +32,10 @@
             background-color: #0b0f19;
             color: #e2e8f0;
         }
-        
-        #particle-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
         #app {
             position: relative;
             z-index: 10;
         }
-
-        .terminal-box, .markdown-body code { 
-            font-family: 'JetBrains Mono', Consolas, monospace !important; 
-        }
-
-        .markdown-body { font-size: 0.95rem; color: #e2e8f0; }
-        .markdown-body p { margin-bottom: 0.75rem; line-height: 1.7; }
-        .markdown-body pre { 
-            background: rgba(15, 23, 42, 0.6); 
-            backdrop-filter: blur(4px);
-            padding: 1rem; 
-            border-radius: 0.75rem; 
-            overflow-x: auto; 
-            margin-bottom: 1rem; 
-            border: 1px solid rgba(71, 85, 105, 0.3); 
-            color: #cbd5e1; 
-        }
-        .markdown-body code { 
-            background: rgba(30, 41, 59, 0.6); 
-            padding: 0.2rem 0.4rem; 
-            border-radius: 0.375rem; 
-            font-size: 0.85em; 
-            color: #c4b5fd; 
-        }
-        .markdown-body pre code { 
-            color: inherit; 
-            background: transparent; 
-            padding: 0; 
-        }
-        
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(71, 85, 105, 0.6); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.8); }
-        
-        .sidebar-glass {
-            background: rgba(17, 25, 40, 0.75);
-            backdrop-filter: blur(12px);
-            border-right: 1px solid rgba(71, 85, 105, 0.3);
-        }
-        
-        .header-glass {
-            background: rgba(17, 25, 40, 0.6);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-        }
-
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-        .cursor-blink { animation: blink 1s step-end infinite; }
-        .terminal-box { max-height: 500px; overflow-y: auto; scroll-behavior: smooth; }
-        .terminal-box * { overflow-anchor: none; }
-        .scroll-anchor { overflow-anchor: auto; height: 1px; }
-        
-        .chat-bubble-enter-active, .chat-bubble-leave-active { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .chat-bubble-enter-from { opacity: 0; transform: translateY(15px) scale(0.98); }
-        
-        .toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
-        .toast-enter-from, .toast-leave-to { opacity: 0; transform: translate(-50%, -20px); }
     </style>
 </head>
 <body class="antialiased">
@@ -157,6 +91,11 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 10l.01 0"></path></svg>
                     漏洞情报 聚合
                 </button>
+                <button @click="switchTab('schedule'); mobileMenuOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium" 
+                        :class="currentTab === 'schedule' ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-400 hover:bg-slate-800/50'">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    任务调度
+                </button>
             </div>
             
             <div class="flex-1 overflow-y-auto p-3 space-y-1">
@@ -169,9 +108,10 @@
                 <div v-if="sessionsList.length === 0" class="text-xs text-center mt-6 opacity-50">暂无历史记录</div>
                 <button v-for="session in sessionsList" :key="session.session_id"
                         @click="switchSession(session.session_id); mobileMenuOpen = false"
-                        class="w-full text-left px-3 py-3 rounded-xl transition-all text-sm flex items-center gap-3 group relative"
+                        class="w-full text-left px-3 py-3 rounded-xl transition-all text-sm flex flex-col gap-0.5 group relative"
                         :class="currentSessionId === session.session_id && currentTab === 'chat' ? 'bg-slate-800/80 border-slate-700 text-indigo-300 font-semibold' : 'text-slate-400 hover:bg-slate-800/40 border border-transparent'">
-                    <span class="truncate flex-1">{{ session.title }}</span>
+                    <span class="truncate text-sm">{{ session.title }}</span>
+                    <span class="text-[10px] opacity-50">{{ formatSessionTime(session.updated_at) }}</span>
                 </button>
             </div>
         </aside>
@@ -196,9 +136,9 @@
                     
                     <div class="w-px h-4 opacity-30 bg-slate-700"></div>
 
-                    <button @click="openConfigModal" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-transparent backdrop-blur-sm transition-colors hover:border-indigo-400/30 bg-slate-800/40 text-slate-300 hover:text-indigo-300">
+                    <button @click="openConfigModal" title="配置 Agent API Key" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-transparent backdrop-blur-sm transition-colors hover:border-indigo-400/30 bg-slate-800/40 text-slate-300 hover:text-indigo-300">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span class="text-xs font-medium hidden sm:inline">调度配置</span>
+                        <span class="text-xs font-medium hidden sm:inline">Agent Key</span>
                     </button>
 
                     <button @click="handleLogout" class="p-2 rounded-full transition-colors backdrop-blur-sm hover:bg-rose-500/10 text-slate-400 hover:text-rose-400">
@@ -223,154 +163,122 @@
                 v-show="currentTab === 'vulns'" 
                 :token="token">
             </vuln-list>
+
+            <task-scheduler 
+                v-show="currentTab === 'schedule'" 
+                :token="token">
+            </task-scheduler>
         </div>
 
-        <div v-if="showConfigModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-            <div class="rounded-2xl w-full max-w-[800px] h-[500px] shadow-2xl flex overflow-hidden bg-slate-900/90 backdrop-blur-md border border-slate-700">
+                <div v-if="showConfigModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" @click.self="closeConfigModal">
+            <div class="rounded-2xl w-full max-w-[720px] max-h-[85vh] shadow-2xl flex flex-col overflow-hidden bg-slate-900/95 backdrop-blur-md border border-slate-700">
                 
-                <div class="w-1/3 border-r flex flex-col bg-slate-900 border-slate-700">
-                    <div class="p-4 border-b bg-slate-800 border-slate-700">
-                        <h3 class="font-bold text-lg tracking-tight text-slate-100">配置中心</h3>
-                        <p class="text-xs mt-1 text-slate-400">管理微服务智能体密钥</p>
+                <!-- Header -->
+                <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-500/20 text-indigo-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-100">配置中心</h2>
+                            <p class="text-xs text-slate-400">管理微服务智能体密钥</p>
+                        </div>
                     </div>
-                    <div class="flex-1 overflow-y-auto p-2 space-y-1">
-                        <button v-for="tab in agentTabs" :key="tab.id" 
-                                @click="switchConfigTab(tab.id)"
-                                class="w-full text-left px-3 py-3 rounded-xl transition-all border"
-                                :class="activeConfigTab === tab.id ? 'bg-slate-800 border-slate-700 text-indigo-400' : 'border-transparent text-slate-400 hover:bg-slate-800/50'">
-                            <div class="font-medium text-sm">{{ tab.name }}</div>
-                            <div class="text-[10px] mt-0.5" :class="activeConfigTab === tab.id ? 'text-indigo-500' : 'text-slate-500'">{{ tab.desc }}</div>
-                        </button>
+                    <button @click="closeConfigModal" class="p-2 rounded-lg hover:bg-slate-700/50 text-slate-400 hover:text-slate-200 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Tab bar -->
+                <div class="flex border-b border-slate-700 bg-slate-900/50 px-2">
+                    <button v-for="tab in agentTabs" :key="tab.id"
+                            @click="activeConfigTab = tab.id"
+                            class="px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap"
+                            :class="activeConfigTab === tab.id ? 'border-indigo-500 text-indigo-300' : 'border-transparent text-slate-400 hover:text-slate-200'">
+                        {{ tab.name }}
+                    </button>
+                </div>
+
+                <!-- Form body -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <div v-if="configSaving" class="mb-3 px-3 py-2 rounded-lg text-xs font-medium bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                        保存中...
+                    </div>
+                    <div v-if="config保存d" class="mb-3 px-3 py-2 rounded-lg text-xs font-medium bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center gap-2">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        {{ activeConfigTab === 'global' ? '已保存至本地缓存' : '已同步至服务端' }}
+                    </div>
+                    <div v-if="configError" class="mb-3 px-3 py-2 rounded-lg text-xs font-medium bg-rose-500/10 border border-rose-500/30 text-rose-300">
+                        {{ configError }}
+                    </div>
+
+                    <div class="space-y-5">
+                        <!-- 服务提供商 (only for global) -->
+                        <div v-if="activeConfigTab === 'global'">
+                            <label class="block text-sm font-semibold mb-1.5 text-slate-300">Provider</label>
+                            <select v-model="agentConfigs.global.provider" class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none bg-slate-800 border-slate-700 text-slate-200">
+                                <option value="openai">OpenAI</option>
+                                <option value="deepseek">DeepSeek</option>
+                                <option value="anthropic">Anthropic (Claude)</option>
+                            </select>
+                            <p class="text-[11px] mt-1.5 text-slate-500">选择主控节点的 LLM 服务商</p>
+                        </div>
+
+                        <!-- 驱动模型 -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-1.5 text-slate-300">Model</label>
+                            <input v-model="agentConfigs[activeConfigTab].model" type="text" 
+                                   placeholder="例如: gpt-4o / deepseek-chat"
+                                   class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none bg-slate-800 border-slate-700 text-slate-200">
+                        </div>
+
+                        <!-- 授权密钥 -->
+                        <div>
+                            <label class="block text-sm font-semibold mb-1.5 text-slate-300">API Key</label>
+                            <div class="relative">
+                                <input v-model="agentConfigs[activeConfigTab].apiKey" 
+                                       :type="showApiKey ? 'text' : 'password'" 
+                                       :placeholder="activeConfigTab === 'global' ? 'sk-... (保存在本地)' : '留空则继承全局密钥'"
+                                       class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none font-mono pr-10 bg-slate-800 border-slate-700 text-slate-200">
+                                <button @click="showApiKey = !showApiKey" class="absolute right-3 top-2.5 text-slate-400 hover:text-indigo-400 transition-colors">
+                                    <svg v-if="!showApiKey" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                                </button>
+                            </div>
+                            <p class="text-[11px] mt-1.5 text-slate-500">
+                                <span v-if="activeConfigTab === 'global'">主控 Key 保存在本地浏览器缓存中</span>
+                                <span v-else>留空则继承全局主控 Key。自定义 Key 将保存至服务端。</span>
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="w-2/3 flex flex-col bg-slate-900">
-                    <div class="p-6 flex-1 overflow-y-auto">
-                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-700">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center bg-indigo-500/20 text-indigo-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                            </div>
-                            <h2 class="text-lg font-bold text-slate-100">{{ agentTabs.find(t => t.id === activeConfigTab)?.name }} 设置</h2>
-                        </div>
-
-                        <div class="space-y-5" v-if="agentConfigs[activeConfigTab]">
-                            <div v-if="activeConfigTab === 'global'">
-                                <label class="block text-sm font-semibold mb-1.5 text-slate-300">服务提供商 (Provider)</label>
-                                <select v-model="agentConfigs[activeConfigTab].provider" class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all bg-slate-800 border-slate-700 text-slate-200">
-                                    <option value="openai">OpenAI</option>
-                                    <option value="deepseek">DeepSeek</option>
-                                    <option value="anthropic">Anthropic (Claude)</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold mb-1.5 text-slate-300">驱动模型 (Model)</label>
-                                <input v-model="agentConfigs[activeConfigTab].model" type="text" placeholder="例如: gpt-4o 或 deepseek-chat" class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all bg-slate-800 border-slate-700 text-slate-200">
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold mb-1.5 text-slate-300">授权密钥 (API Key)</label>
-                                <div class="relative">
-                                    <input v-model="agentConfigs[activeConfigTab].apiKey" 
-                                           :type="showApiKey ? 'text' : 'password'" 
-                                           placeholder="sk-..." 
-                                           class="w-full border px-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all font-mono pr-10 bg-slate-800 border-slate-700 text-slate-200">
-                                    <button @click="showApiKey = !showApiKey" class="absolute right-3 top-2.5 text-slate-400 hover:text-indigo-500 transition-colors">
-                                        <svg v-if="!showApiKey" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
-                                    </button>
-                                </div>
-                                <p class="text-[11px] mt-1.5 ml-1 text-slate-500">
-                                    <span v-if="activeConfigTab === 'global'">此主控 Key 保存在本地浏览器缓存中。</span>
-                                    <span v-else>此扩展 Agent 的 Key 将加密保存至云端数据库。</span>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="p-4 border-t flex justify-end gap-3 bg-slate-900 border-slate-700">
-                        <button @click="closeConfigModal" class="px-5 py-2.5 text-sm font-medium rounded-xl transition-all text-slate-300 hover:bg-slate-800">取消关闭</button>
-                        <button @click="saveCurrentConfig" class="px-6 py-2.5 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 rounded-xl transition-all flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            保存该页配置
-                        </button>
-                    </div>
+                <!-- Footer -->
+                <div class="px-6 py-4 border-t border-slate-700 flex justify-between items-center bg-slate-900/80">
+                    <button @click="closeConfigModal" class="px-4 py-2 text-sm font-medium rounded-xl text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-all">
+                        取消
+                    </button>
+                    <button @click="saveCurrentConfig" 
+                            :disabled="configSaving"
+                            class="px-6 py-2.5 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white shadow-md shadow-indigo-500/20 rounded-xl transition-all flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Save {{ activeConfigTab === 'global' ? 'Global' : agentTabs.find(function(t){return t.id===activeConfigTab}).name }} Config
+                    </button>
                 </div>
             </div>
         </div>
 
+        </div>
+
     </div>
 
-    <script>
-        (function() {
-            const canvas = document.getElementById('particle-canvas');
-            const ctx = canvas.getContext('2d');
-            let width, height;
-            let particles = [];
+    <script src="./js/particles.js"></script>
+    <script>Particles.init();</script>
 
-            function initParticles() {
-                const count = Math.floor((width * height) / 12000);
-                particles = [];
-                for (let i = 0; i < count; i++) {
-                    particles.push({
-                        x: Math.random() * width,
-                        y: Math.random() * height,
-                        radius: Math.random() * 2 + 1,
-                        speedX: (Math.random() - 0.5) * 0.3,
-                        speedY: (Math.random() - 0.5) * 0.3,
-                        color: `rgba(${99 + Math.floor(Math.random()*156)}, ${102 + Math.floor(Math.random()*100)}, ${241 + Math.floor(Math.random()*14)}, ${0.2 + Math.random()*0.3})`
-                    });
-                }
-            }
-
-            function resizeCanvas() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                canvas.width = width;
-                canvas.height = height;
-                initParticles();
-            }
-
-            function drawParticles() {
-                ctx.clearRect(0, 0, width, height);
-                particles.forEach(p => {
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = p.color;
-                    ctx.fill();
-
-                    p.x += p.speedX;
-                    p.y += p.speedY;
-
-                    if (p.x < 0 || p.x > width) p.speedX *= -1;
-                    if (p.y < 0 || p.y > height) p.speedY *= -1;
-                });
-
-                ctx.strokeStyle = 'rgba(139, 92, 246, 0.08)';
-                ctx.lineWidth = 0.5;
-                for (let i = 0; i < particles.length; i++) {
-                    for (let j = i + 1; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx*dx + dy*dy);
-                        if (dist < 120) {
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-
-                requestAnimationFrame(drawParticles);
-            }
-
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-            drawParticles();
-        })();
-    </script>
-
+    <script src="./js/security.js"></script>
+    <script src="./js/utils.js"></script>
+    <script src="./js/wsClient.js"></script>
     <script type="module" src="./js/main.js"></script>
 </body>
 </html>

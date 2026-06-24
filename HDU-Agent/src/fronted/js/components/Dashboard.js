@@ -5,7 +5,9 @@ export default {
     props: ['token'],
     template: `
         <main class="flex-1 overflow-y-auto p-4 md:p-6 transition-colors duration-300 bg-transparent" id="dashboard-container">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <skeleton-loader v-if="loading" type="card" :rows="4"></skeleton-loader>
+            <template v-else>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div class="p-5 rounded-2xl shadow-sm border flex flex-col justify-center transition-all backdrop-blur-md bg-slate-800/40 border-slate-700/50">
                     <span class="text-sm font-medium text-slate-300">安全态势评分</span>
                     <span class="text-3xl font-bold text-emerald-400 mt-2">{{ dashboardStats.summary?.security_score || '-' }}<span class="text-lg font-normal ml-1 text-slate-400">/100</span></span>
@@ -34,10 +36,12 @@ export default {
                     <div id="graphChart" class="w-full flex-1"></div>
                 </div>
             </div>
+            </template>
         </main>
     `,
     setup(props) {
         const dashboardStats = ref({});
+        const loading = ref(true);
         let pieChartInstance = null;
         let graphChartInstance = null;
         let resizeObserver = null;
@@ -48,6 +52,7 @@ export default {
                     headers: { 'Authorization': `Bearer ${props.token}` }
                 });
                 dashboardStats.value = res.data;
+                loading.value = false;
 
                 const pieDom = document.getElementById('pieChart');
                 if (!pieDom) return;
@@ -95,6 +100,7 @@ export default {
                     }]
                 });
             } catch (error) {
+                loading.value = false;
                 console.error('获取大盘数据失败:', error);
                 if(window.$toast) window.$toast('拉取大盘数据失败', 'error');
             }
@@ -118,6 +124,6 @@ export default {
             if (graphChartInstance) graphChartInstance.dispose();
         });
 
-        return { dashboardStats };
+        return { dashboardStats, loading };
     }
 }
