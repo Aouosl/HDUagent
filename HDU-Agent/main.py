@@ -2,19 +2,16 @@
 import sys
 from pathlib import Path
 
+# 0. 初始化日志系统（必须在导入其他模块前）
+from src.config.logging_config import setup_logging
+setup_logging()
+
 # 1. 注册主项目根目录 (你原有的代码)
 root_dir = Path(__file__).resolve().parent
 if str(root_dir) not in sys.path:
     sys.path.append(str(root_dir))
 
-# 2. 新增：注册 pentest-agent 子项目的绝对路径
-# 这样底层代码执行 import agents 或 import utils 时就能直接找到了
-pentest_agent_dir = root_dir / "src" / "Agent" / "subagent" / "pentest_agent" / "pentest-agent"
-if str(pentest_agent_dir) not in sys.path:
-    # 使用 insert(0) 把它放在路径列表最前面，防止主项目中刚好也有同名文件夹产生冲突
-    sys.path.insert(0, str(pentest_agent_dir))
-
-# 3. 必须在完成路径注册后，再进行本地模块的导入！
+# 2. 必须在完成路径注册后，再进行本地模块的导入！
 from src.Agent.manager.graph import app
 
 
@@ -60,8 +57,8 @@ def main():
                         chat_history.append(("assistant", content))
                         print("-" * 40)
 
-                    elif node_name == "pentest_agent":
-                        print(f"⚡ [系统提示]: 子智能体 pentest_agent 执行完毕，正在将报告回传给队长...")
+                    elif node_name != "analyzer" and node_name != "manager":
+                        print(f"⚡ [系统提示]: 子智能体 {node_name} 执行完毕，正在将报告回传给队长...")
                         # 子智能体产生的隐式对话（汇报结果）也存入历史，作为下一次 Manager 思考的依据
                         latest_message = node_state['messages'][-1]
                         content = latest_message.content if hasattr(latest_message, 'content') else latest_message[1]
